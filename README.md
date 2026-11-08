@@ -22,6 +22,22 @@ user in Iran ──► Iran server (public IP, forwarded ports) ──[ bp0 tunn
 - Tunnel addresses: Iran `10.10.0.1`, kharej `10.10.0.2` (a /30 on interface `bp0`).
 - Users connect to the **Iran IP** on the forwarded ports; each port goes to the same port on kharej.
 
+## One-command install (this relay only)
+
+```bash
+# 1) kharej server (abroad): installs official BackPack, writes the config + service, prints the Iran command
+sudo bash scripts/install-relay.sh kharej
+
+# 2) Iran server: paste the token from step 1 (do not post it anywhere)
+sudo TUNNEL_TOKEN='...' bash scripts/install-relay.sh iran KHAREJ_IP --ports "80,8080,8443,2053"
+
+bash scripts/install-relay.sh status        # service, bp0 and ping of the other end
+```
+
+It sets up exactly one thing: the Direct PCK layer-3 relay above. Use `--dry-run` to see the config without
+installing; `uninstall` removes only this relay's config and service. It refuses to run if another BackPack
+`l3` tunnel is active on `bp0`. For a server that already has a tunnel, keep using BackPack's own menu.
+
 ## Setup (about 20 minutes)
 
 1. Install BackPack from its official repository on both servers (follow its README, unmodified).
@@ -51,7 +67,7 @@ user in Iran ──► Iran server (public IP, forwarded ports) ──[ bp0 tunn
 
 - `configs/iran-dial.toml.example`, `configs/kharej-listen.toml.example`: the values of a working pair
   (the secret line BackPack generates is intentionally absent; never commit it).
-- `scripts/monitor.sh`, `scripts/install-monitor.sh IRAN_IP PORT...` (as root on the kharej server): 5-minute reachability log + systemd timer.
+- `scripts/install-relay.sh` (installer for this relay), `scripts/monitor.sh`, `scripts/install-monitor.sh IRAN_IP PORT...` (as root on the kharej server): 5-minute reachability log + systemd timer.
   Note: its `public_ping` and `ports` fields are tested from the kharej server, so they fail when the Iran IP is
   closed from abroad even though users are fine.
 - `scripts/bw.py`, `scripts/mtu-check.sh`, `scripts/sni-probe.sh`, `scripts/check-ports.sh`: the checks above.
