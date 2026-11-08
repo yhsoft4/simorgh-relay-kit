@@ -1,0 +1,14 @@
+# KHAREJ side (server abroad). Listens for the Iran side. Same note about the secret line as above.
+[l3]
+mode         = "listen"
+addr         = "0.0.0.0:9000"
+carrier      = "pck"
+encap        = "gre"
+iface        = "bp0"
+local_ip     = "10.10.0.2"
+peer_ip      = "10.10.0.1"
+mtu          = 1400
+preset       = "balance"
+txqueuelen   = 1024
+qdisc        = "fq_codel"
+sockbuf      = 4194304
